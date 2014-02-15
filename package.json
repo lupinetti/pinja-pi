@@ -1,0 +1,32 @@
+{
+  "name": "pinja-pi",
+  "version": "0.0.0",
+  "description": "A pin driver library for the raspberry pi",
+  "main": "pinja-pi.js",
+  "directories": {
+    "example": "examples",
+    "lib" : "libs"
+  },
+  "scripts": {
+    "test": "mocha test/stub.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ryan-sandy/pinja-pi.git"
+  },
+  "keywords": [
+    "raspberry-pi",
+    "raspberry",
+    "pi",
+    "gpio"
+  ],
+  "author": "Ryan Lee",
+  "license": "Apache",
+  "bugs": {
+    "url": "https://github.com/ryan-sandy/pinja-pi/issues"
+  },
+  "dependencies": {
+    "async": "~0.2.10"
+  },
+  "devDependencies": {}
+}
