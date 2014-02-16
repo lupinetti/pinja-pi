@@ -14,6 +14,16 @@
 
 'use strict';
 /*jslint node:true, indent:2, nomen:true*/
-var pinja = require('./libs/constants.js');
-pinja.Board = require('./libs/board.js');
-module.exports = pinja;
+
+module.exports = {
+  'HI' : 1,
+  'LOW' : 0,
+  'OUTPUT' : 'out',
+  'INPUT' : 'in',
+  'edge' : {
+    'RISING' : 'rising',
+    'FALLING' : 'falling',
+    'BOTH' : 'both',
+    'NONE' : 'none'
+  }
+};

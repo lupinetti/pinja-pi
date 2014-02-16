@@ -60,6 +60,23 @@ Board.prototype.ready = function (next) {
 };
 
 Board.prototype.unload = function (next) {
+  var self = this;
+  async.each(
+    Object.keys(this.pins),
+    function (p, iterate) {
+      self.pins[p].unexport(function (err) {
+        if (err) { return iterate(err); }
+        delete self.pins[p];
+        self.log.debug('Pin ' + p + ' destroyed.');
+        iterate();
+      });
+    },
+    function (err) {
+      if (err) { return next(err); }
+      self.log.debug('Board Unloaded.');
+      next(err);
+    }
+  );
 };
 
 module.exports = Board;

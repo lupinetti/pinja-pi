@@ -15,33 +15,47 @@
 'use strict';
 /*jslint node:true, indent:2, nomen:true*/
 
-var pinja = require('pinja-pi')
+var pinja = require('../pinja-pi.js');
 
 //initalize the board.
 //Pin has the led connected to it
 //We set to be a gpio in output mode
 var board = pinja.board({
-  'p11' : {
+  'p17' : {
     'type' : 'gpio',
-    'mode' : 'output'
+    'direction' : 'output'
   }
 });
 
-//make a shorthand for p11
-var p11 = board.pins.p11;
-
-//Do not use p11 here. It is not initalized untill you call ready
+//This function unloads the board
+var done = function () {
+  board.unload(function (err) {
+    if (err) {
+      console.log(err);
+      process.exit(1);
+    }
+    process.exit(0);
+  });
+};
 
 //We waiting for the board to get ready
-board.ready(function(err) {
-  //handle any errors that occured
+board.ready(function (err) {
+  var pin = board.pins.p17;
+
+  //if an error occured during setup
+  //log it and unload the board
   if (err) {
     console.log(err);
-    process.exit(1);
+    return done();
   }
-  
-  p11.digitalWriteSync(1);
+
+  //turn the pin on
+  //wait 5 seconds
+  //turn the pin off
+  //unload the board
+  pin.digitalWriteSync(1);
   setInterval(function () {
-    p11.digitalWriteSync(0);
+    pin.digitalWriteSync(0);
+    done();
   }, 5000);
 });
