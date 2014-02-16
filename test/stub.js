@@ -49,6 +49,23 @@ describe('Board tests', function () {
       done();
     });
   });
+  it('should read a pin', function (done) {
+    var b = new pinja.Board({
+      'p7' : {
+        'type' : 'gpio',
+        'mode' : pinja.INPUT,
+        'path' : __dirname + '/fs'
+      }
+    });
+    b.ready(function (err) {
+      assert.ifError(err);
+      b.pins.p7.digitalRead(function (err, val) {
+        assert.ifError(err);
+        assert.equal(val, 1);
+        done();
+      });
+    });
+  });
   it('should unload the board', function (done) {
     var b = new pinja.Board({
       'p7' : {

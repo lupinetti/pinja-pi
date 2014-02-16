@@ -57,10 +57,22 @@ Pin.prototype.attachInterrupt = function (next) {
 Pin.prototype.detachInterrupt = function (next) {
 };
 
-Pin.prototype.digitalRead = function (val, next) {
+Pin.prototype.digitalRead = function (next) {
+  var self = this,
+    path = this._path + '/gpio' + this._pin + '/value';
+  self.log.debug('Reading ' + path);
+  fs.readFile(path, 'utf8', function (err, data) {
+    next(err, data);
+  });
 };
 
 Pin.prototype.digitalReadySync = function (val) {
+  var self = this,
+    path = this._path + '/gpio' + this._pin + '/value';
+  self.log.debug('Reading ' + path);
+  fs.readFileSync(path, 'utf8', function (err, data) {
+    next(err, data);
+  });
 };
 
 //Params:
