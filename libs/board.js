@@ -29,6 +29,7 @@ function Board(pins, opts) {
   this.pins = {};
 
   //parse the options
+  this.revision = opts.revision || 'rev2';
   this.path = opts.path;
   if (!opts.log) { opts.log = {}; }
   this.log = {
@@ -44,16 +45,18 @@ Board.prototype.ready = function (next) {
   async.each(
     Object.keys(this._rawPins),
     function (p, iterate) {
+      self._rawPins[p].log = self.log;
+      self._rawPins[p].revision = self.revision;
       self.pins[p] = new Pin(p, self._rawPins[p]);
+      self.log.debug('Pin ' + p + ' created.');
       self.pins[p].init(function (err) {
         if (err) { return iterate(err); }
-        self.log.debug('Pin ' + p + ' created.');
         iterate();
       });
     },
     function (err) {
       if (err) { return next(err); }
-      self.log.debug('Board ready.');
+      self.log.info('Board ready.');
       next(err);
     }
   );
@@ -73,7 +76,7 @@ Board.prototype.unload = function (next) {
     },
     function (err) {
       if (err) { return next(err); }
-      self.log.debug('Board Unloaded.');
+      self.log.info('Board Unloaded.');
       next(err);
     }
   );

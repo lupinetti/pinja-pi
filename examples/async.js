@@ -28,12 +28,6 @@ var board = new pinja.Board({
   'p15' : {
     'direction' : 'output'
   }
-}, {
-  'log' : {
-    'debug' : function (message) {
-      console.log(message);
-    }
-  }
 });
 
 var exit = function () {
@@ -47,50 +41,45 @@ var exit = function () {
 };
 
 board.ready(function (err) {
-  var red, green, blue;
+  var red, green, blue, delay;
   red = board.pins.p11;
   green = board.pins.p13;
   blue = board.pins.p15;
-  
+
   if (err) {
     console.log(err);
     return exit();
   }
+
+  //helper function
+  delay = function (cb) {
+    setTimeout(function () {
+      cb();
+    }, 5000);
+  };
   
   async.series([
     function (cb) {
       red.digitalWrite(pinja.HI, function (err) {
         console.log('red on');
-        if (err) { return cb(err); }
-        setInterval(function () {
-          console.log('turning on green');
-          cb();
-        }, 5000);
+        cb(err);
       });
     },
+    delay,
     function (cb) {
       green.digitalWrite(pinja.HI, function (err) {
         console.log('green on');
-        if (err) { return cb(err); }
-        setInterval(function () {
-          console.log('turning on blue');
-          cb();
-        }, 5000);
+        cb(err);
       });
     },
+    delay,
     function (cb) {
       blue.digitalWrite(pinja.HI, function (err) {
         console.log('blue on');
-        if (err) { 
-          console.log(err);
-          return cb(err); 
-        }
-        setInterval(function () {
-          console.log('turning off pins');
-          cb();
-        }, 5000);
+        cb(err);
       });
     },
+    delay,
     function (cb) {
       async.parallel([
         function (call) {
@@ -110,5 +99,4 @@ board.ready(function (err) {
     if (err) { console.log(err); }
     exit();
   });
-  
 });
