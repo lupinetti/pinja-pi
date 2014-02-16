@@ -63,7 +63,7 @@ Pin.prototype.digitalRead = function (next) {
     path = this._path + '/gpio' + this._pin + '/value';
   self.log.debug('Reading ' + path);
   fs.readFile(path, 'utf8', function (err, data) {
-    next(err, data);
+    next(err, data[0]);
   });
 };
 
@@ -71,7 +71,7 @@ Pin.prototype.digitalReadySync = function (val) {
   var self = this,
     path = this._path + '/gpio' + this._pin + '/value';
   self.log.debug('Reading Sync ' + path);
-  return fs.readFileSync(path, 'utf8');
+  return fs.readFileSync(path, 'utf8')[0];
 };
 
 //Params:
@@ -124,9 +124,13 @@ Pin.prototype.setDirection = function (next) {
 };
 
 Pin.prototype.setActive = function (next) {
-  var path = this._path + '/gpio' + this._pin + '/active_low';
-  this.log.debug('Writing ' + path + ' value=' + this.active);
-  fs.writeFile(path, this.active, function (err) {
+  var path = this._path + '/gpio' + this._pin + '/active_low',
+    activeLow = 0;
+  if (this.active === pinja.LOW) {
+    activeLow = 1;
+  }
+  this.log.debug('Writing ' + path + ' value=' + activeLow);
+  fs.writeFile(path, activeLow, function (err) {
     next(err);
   });
 };

@@ -23,7 +23,6 @@ var board = new pinja.Board({
     'direction' : pinja.INPUT
   }
 });
-
 var exit = function () {
   board.unload(function (err) {
     if (err) {
@@ -52,7 +51,7 @@ board.ready(function (err) {
       });
     },
     function (cb) {
-      pin.acitve = pinja.LOW;
+      pin.active = pinja.LOW;
       pin.setActive(cb);
     },
     function (cb) {
