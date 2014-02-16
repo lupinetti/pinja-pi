@@ -20,13 +20,13 @@ var pinja = require('../pinja-pi.js');
 
 var board = new pinja.Board({
   'p11' : {
-    'direction' : 'output'
+    'direction' : pinja.OUTPUT
   },
   'p13' : {
-    'direction' : 'output'
+    'direction' : pinja.OUTPUT
   },
   'p15' : {
-    'direction' : 'output'
+    'direction' : pinja.OUTPUT
   }
 });
 
@@ -57,7 +57,7 @@ board.ready(function (err) {
       cb();
     }, 5000);
   };
-  
+
   async.series([
     function (cb) {
       red.digitalWrite(pinja.HI, function (err) {
