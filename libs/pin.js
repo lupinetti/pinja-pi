@@ -53,9 +53,23 @@ function Pin(name, opts) {
 }
 
 Pin.prototype.attachInterrupt = function (next) {
+  var self = this,
+    path = this._path + '/gpio' + this._pin + '/value';
+  self.log.debug('Wathcing ' + path);
+  self._fsWatcher = fs.watch(path);
+  self._fsWatcher.on('change', function () {
+    self.log.debug(self.name + ' interrupted.');
+    self.digitalRead(next);
+  });
+  self._fsWatcher.on('error', function (err) {
+    self.log.error('Interrupt error occured');
+    self._fsWatcher.close();
+    next(err);
+  });
 };
 
-Pin.prototype.detachInterrupt = function (next) {
+Pin.prototype.detachInterrupt = function () {
+  self._fsWatcher.close();
 };
 
 Pin.prototype.digitalRead = function (next) {
