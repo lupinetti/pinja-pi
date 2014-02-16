@@ -16,6 +16,7 @@
 /*jslint node:true, indent:2, nomen:true*/
 
 var pinja = require('../pinja-pi.js');
+var async = require('async');
 
 var board = new pinja.Board({
   'p3' : {
@@ -41,12 +42,31 @@ board.ready(function (err) {
     return exit();
   }
 
-  pin.digitalRead(function (err, val) {
+  async.series([
+    function (cb) {
+      //Read the value when the pin is active hi (default)
+      pin.digitalRead(function (err, val) {
+        if (err) { cb(err); }
+        console.log('Value:' + val);
+        cb();
+      });
+    },
+    function (cb) {
+      pin.acitve = pinja.LOW;
+      pin.setActive(cb);
+    },
+    function (cb) {
+      //Read the value when it's active low
+      pin.digitalRead(function (err, val) {
+        if (err) { return cb(err); }
+        console.log('Value:' + val);
+        cb();
+      });
+    },
+  ], function (err) {
     if (err) {
       console.log(err);
-      return exit();
     }
-    console.log('Value:' + val);
     exit();
   });
 });

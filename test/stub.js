@@ -66,6 +66,24 @@ describe('Board tests', function () {
       });
     });
   });
+  it('should read a pin with active_low', function (done) {
+    var b = new pinja.Board({
+      'p7' : {
+        'type' : 'gpio',
+        'mode' : pinja.INPUT,
+        'path' : __dirname + '/fs',
+        'active' : pinja.LOW
+      }
+    });
+    b.ready(function (err) {
+      assert.ifError(err);
+      b.pins.p7.digitalRead(function (err, val) {
+        assert.ifError(err);
+        assert.equal(val, 1);
+        done();
+      });
+    });
+  });
   it('should unload the board', function (done) {
     var b = new pinja.Board({
       'p7' : {
@@ -111,6 +129,11 @@ describe('clean up', function () {
       },
       function (cb) {
         fs.unlink(__dirname + '/fs/gpio4/edge', function (err) {
+          cb(err);
+        });
+      },
+      function (cb) {
+        fs.unlink(__dirname + '/fs/gpio4/active_low', function (err) {
           cb(err);
         });
       },

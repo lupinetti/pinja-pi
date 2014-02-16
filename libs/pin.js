@@ -13,7 +13,7 @@
 //limitations under the License.
 
 'use strict';
-/*jslint node:true, indent:2, nomen:true*/
+/*jslint node:true, indent:2, nomen:true, stupid:true*/
 
 var pinMap = require('./pinMap.js');
 var pinja = require('./constants.js');
@@ -48,6 +48,7 @@ function Pin(name, opts) {
   if (opts.direction === pinja.INPUT) {
     this._direction = pinja.INPUT;
   }
+  this.active = opts.active || pinja.HI;
   this._path = opts.path || '/sys/class/gpio';
 }
 
@@ -69,10 +70,8 @@ Pin.prototype.digitalRead = function (next) {
 Pin.prototype.digitalReadySync = function (val) {
   var self = this,
     path = this._path + '/gpio' + this._pin + '/value';
-  self.log.debug('Reading ' + path);
-  fs.readFileSync(path, 'utf8', function (err, data) {
-    next(err, data);
-  });
+  self.log.debug('Reading Sync ' + path);
+  return fs.readFileSync(path, 'utf8');
 };
 
 //Params:
@@ -82,8 +81,9 @@ Pin.prototype.digitalWrite = function (val, next) {
   if (val !== pinja.HI && val !== pinja.LOW) {
     return next(new Error('Invalid value'));
   }
-  this.log.debug('Writing ' + this.name + ' val(' + val + ')');
-  fs.writeFile(this._path + '/gpio' + this._pin + '/value', val, function (err) {
+  var path = this._path + '/gpio' + this._pin + '/value';
+  this.log.debug('Writing ' + path + ' value=' + val);
+  fs.writeFile(path, val, function (err) {
     next(err);
   });
 };
@@ -94,8 +94,9 @@ Pin.prototype.digitalWriteSync = function (val) {
   if (val !== pinja.HI && val !== pinja.LOW) {
     throw new Error('Invalid value');
   }
-  this.log.debug('Writing Sync ' + this.name + ' val(' + val + ')');
-  fs.writeFileSync(this._path + '/gpio' + this._pin + '/value', val);
+  var path = this._path + '/gpio' + this._pin + '/value';
+  this.log.debug('Writing ' + path + ' value=' + val);
+  fs.writeFileSync(path, val);
 };
 
 Pin.prototype.setEdge = function (val, next) {
@@ -107,15 +108,25 @@ Pin.prototype.setEdge = function (val, next) {
   ) {
     return next(new Error('Invalid edge'));
   }
-  this.log.debug(this.name + ' edge ('  + val + ')');
-  fs.writeFile(this._path + '/gpio' + this._pin + '/edge', val, function (err) {
+  var path = this._path + '/gpio' + this._pin + '/edge';
+  this.log.debug('Writing ' + path + ' value=' + val);
+  fs.writeFile(path, val, function (err) {
     next(err);
   });
 };
 
 Pin.prototype.setDirection = function (next) {
-  this.log.debug(this.name + ' direction ('  + this._direction + ')');
-  fs.writeFile(this._path + '/gpio' + this._pin + '/direction', this._direction, function (err) {
+  var path = this._path + '/gpio' + this._pin + '/direction';
+  this.log.debug('Writing' + path + ' value='  + this._direction);
+  fs.writeFile(path, this._direction, function (err) {
+    next(err);
+  });
+};
+
+Pin.prototype.setActive = function (next) {
+  var path = this._path + '/gpio' + this._pin + '/active_low';
+  this.log.debug('Writing ' + path + ' value=' + this.active);
+  fs.writeFile(path, this.active, function (err) {
     next(err);
   });
 };
@@ -139,11 +150,20 @@ Pin.prototype.init = function (next) {
         cb(err);
       });
     },
-    function (cb) {
-      self.setEdge(pinja.edge.NONE, cb);
-    },
-    function (cb) {
-      self.setDirection(cb);
+    function (call) {
+      async.parallel([
+        function (cb) {
+          self.setEdge(pinja.edge.NONE, cb);
+        },
+        function (cb) {
+          self.setDirection(cb);
+        },
+        function (cb) {
+          self.setActive(cb);
+        }
+      ], function (err) {
+        call(err);
+      });
     }
   ], function (err) {
     self.log.info(self.name + ' initalized.');
