@@ -20,8 +20,8 @@ var pinja = require('../pinja-pi.js');
 //initalize the board.
 //Pin has the led connected to it
 //We set to be a gpio in output mode
-var board = pinja.board({
-  'p17' : {
+var board = new pinja.Board({
+  'p11' : {
     'type' : 'gpio',
     'direction' : 'output'
   }
@@ -40,7 +40,7 @@ var done = function () {
 
 //We waiting for the board to get ready
 board.ready(function (err) {
-  var pin = board.pins.p17;
+  var pin = board.pins.p11;
 
   //if an error occured during setup
   //log it and unload the board
