@@ -20,7 +20,17 @@ var async = require('async');
 
 var board = new pinja.Board({
   'p3' : {
-    'direction' : pinja.INPUT
+    'direction' : pinja.INPUT,
+    'edge' : pinja.rising
+  }
+}, {
+  'log' : {
+    'debug' : function (message) {
+      console.log('Debug:' + message);
+    },
+    'info' : function (message) {
+      console.log('Info:' + message);
+    }
   }
 });
 var exit = function () {
@@ -41,7 +51,8 @@ board.ready(function (err) {
     return exit();
   }
 
-  pin.attachIntrrupt(function (err, val) {
+  console.log('listening');
+  pin.attachInterrupt(function (err, val) {
     if (err) {
       console.log(err);
       return exit();

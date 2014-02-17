@@ -42,7 +42,7 @@ function Pin(name, opts) {
   }
   this._pin = pin.gpio;
   this._type = 'gpio';
-  this._edge = pinja.edge.NONE;
+  this.edge = opts.edge || pinja.edge.NONE;
 
   this._direction = pinja.OUTPUT;
   if (opts.direction === pinja.INPUT) {
@@ -56,15 +56,11 @@ Pin.prototype.attachInterrupt = function (next) {
   var self = this,
     path = this._path + '/gpio' + this._pin + '/value';
   self.log.debug('Wathcing ' + path);
-  self._fsWatcher = fs.watch(path);
-  self._fsWatcher.on('change', function () {
+  self._fsWatcher = fs.watch(path, function (p1, p2) {
+    console.log(p1);
+    console.log(p2);
     self.log.debug(self.name + ' interrupted.');
     self.digitalRead(next);
-  });
-  self._fsWatcher.on('error', function (err) {
-    self.log.error('Interrupt error occured');
-    self._fsWatcher.close();
-    next(err);
   });
 };
 
